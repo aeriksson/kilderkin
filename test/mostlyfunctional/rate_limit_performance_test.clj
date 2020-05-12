@@ -58,7 +58,7 @@
 (defn run-default-hopping-window-rate-limiter-test
   []
   (prn "~~~~ Testing hopping window rate limiter ~~~~")
-  (benchmark-hopping-window-rate-limiter 100000 10 100000 10000 5000))
+  (benchmark-hopping-window-rate-limiter 100000 10 100000 10000 1000))
 
 (defn run-default-tests
   []
