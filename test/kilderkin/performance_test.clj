@@ -1,7 +1,7 @@
-(ns mostlyfunctional.rate-limit-performance-test
-  "Performance tests for rate limiters."
+(ns kilderkin.performance-test
+  "Performance tests for Kilderkin rate limiters."
   (:require [criterium.core :refer [with-progress-reporting quick-bench]]
-            [mostlyfunctional.rate-limit :as rl])
+            [kilderkin.core :as k])
   (:gen-class))
 
 (defn gen-op
@@ -17,30 +17,36 @@
 (defn exec-op
   [rl [ts op k v]]
   (case op
-    :insert   (first (rl/allow-ts? rl ts k v))
-    :truncate (first (rl/truncate-ts rl ts))))
+    :insert   (k/insert rl ts k v)
+    :truncate (k/drop-expired rl ts)))
 
 (defn exec-ops
   [rl ops]
   (reduce exec-op rl ops))
 
 (defn benchmark-sliding-window-rate-limiter
-  [n-ops n-keys ts-range-ms window-ms]
-  (let [rate-limiter (rl/sliding-window-rate-limiter window-ms)
+  [n-ops n-keys ts-range-ms window-ms max-per-window]
+  (let [rate-limiter (k/rate-limiter {:window-ms      window-ms
+                                      :max-per-window max-per-window})
         ops          (doall (gen-ops n-ops n-keys ts-range-ms))]
     (with-progress-reporting
       (quick-bench (exec-ops rate-limiter ops) :verbose))))
 
 (defn benchmark-tumbling-window-rate-limiter
-  [n-ops n-keys ts-range-ms window-ms]
-  (let [rate-limiter (rl/tumbling-window-rate-limiter window-ms)
+  [n-ops n-keys ts-range-ms window-ms max-per-window]
+  (let [rate-limiter (k/rate-limiter {:window-type    :tumbling
+                                      :window-ms      window-ms
+                                      :max-per-window max-per-window})
         ops          (gen-ops n-ops n-keys ts-range-ms)]
     (with-progress-reporting
       (quick-bench (exec-ops rate-limiter ops) :verbose))))
 
 (defn benchmark-hopping-window-rate-limiter
-  [n-ops n-keys ts-range-ms window-ms hop-ms]
-  (let [rate-limiter (rl/hopping-window-rate-limiter window-ms hop-ms)
+  [n-ops n-keys ts-range-ms window-ms hop-ms max-per-window]
+  (let [rate-limiter (k/rate-limiter {:window-type    :hopping
+                                      :window-ms      window-ms
+                                      :hop-ms         hop-ms
+                                      :max-per-window max-per-window})
         ops          (doall (gen-ops n-ops n-keys ts-range-ms))]
     (with-progress-reporting
       (quick-bench (exec-ops rate-limiter ops) :verbose))))
@@ -48,17 +54,17 @@
 (defn run-default-sliding-window-rate-limiter-test
   []
   (prn "~~~~ Testing sliding window rate limiter ~~~~")
-  (benchmark-sliding-window-rate-limiter 100000 10 100000 10000))
+  (benchmark-sliding-window-rate-limiter 100000 10 100000 10000 1000))
 
 (defn run-default-tumbling-window-rate-limiter-test
   []
   (prn "~~~~ Testing tumbling window rate limiter ~~~~")
-  (benchmark-tumbling-window-rate-limiter 100000 10 100000 10000))
+  (benchmark-tumbling-window-rate-limiter 100000 10 100000 10000 10))
 
 (defn run-default-hopping-window-rate-limiter-test
   []
   (prn "~~~~ Testing hopping window rate limiter ~~~~")
-  (benchmark-hopping-window-rate-limiter 100000 10 100000 10000 1000))
+  (benchmark-hopping-window-rate-limiter 100000 10 100000 10000 1000 10))
 
 (defn run-default-tests
   []

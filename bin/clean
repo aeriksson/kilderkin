@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Cleans build files.
+
+source $(dirname ${BASH_SOURCE[0]})/util.sh
+run_trace rm -r target cljs-test-runner-out nashorn_code_cache .cpcache 2>/dev/null || true

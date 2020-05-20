@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Builds a JAR file.
+
+source $(dirname ${BASH_SOURCE[0]})/util.sh
+run_trace clojure -A:release jar

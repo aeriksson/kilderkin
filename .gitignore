@@ -1,5 +1,6 @@
 *.class
 *.jar
+.cljs_nashorn_repl
 .cpcache/
 .lein-deps-sum
 .lein-failures
@@ -9,7 +10,9 @@
 .rebel_readline_history
 /checkouts/
 /classes/
+/cljs-test-runner-out/
 /lib/
+/nashorn_code_cache/
 /target/
 pom.xml
 pom.xml.asc

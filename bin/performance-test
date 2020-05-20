@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Runs the performance tests.
+
+source $(dirname ${BASH_SOURCE[0]})/util.sh
+run_trace clojure -A:clj:extras:clj-perf-test

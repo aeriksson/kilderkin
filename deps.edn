@@ -1,0 +1,38 @@
+{:paths   ["src"]
+ :deps    {org.clojure/clojure {:mvn/version "1.10.1"}}
+ :aliases {;; Base targets with shared stuff ;;
+           :clj    {:extra-deps {org.clojure/data.priority-map {:mvn/version "1.0.0"}}}
+           :cljs   {:extra-deps {org.clojure/clojurescript       {:mvn/version "1.10.520"}
+                                 tailrecursion/cljs-priority-map {:mvn/version "1.2.1"}}}
+           :extras {:extra-paths ["test"]
+                    :extra-deps  {criterium {:mvn/version "RELEASE"}}}
+
+           ;; Repls ;;
+           :clj-repl  {:extra-deps {com.bhauman/rebel-readline {:mvn/version "RELEASE"}}
+                       :main-opts  ["-m" "rebel-readline.main"]}
+           :cljs-repl {:extra-deps  {com.bhauman/rebel-readline-cljs {:mvn/version "RELEASE"}
+                                     ; TODO: get rid of this once `rebel-readline-cljs` doesn't need it anymore
+                                     javax.xml.bind/jaxb-api         {:mvn/version "2.4.0-b180830.0359"}}
+                       :main-opts   ["-m" "rebel-readline.cljs.main"]}
+
+           ;; Testing ;;
+           :clj-test      {:extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                                                                   :sha     "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
+                           :main-opts  ["-m" "cognitect.test-runner"]}
+           :clj-perf-test {:main-opts ["-m" "kilderkin.performance-test"]}
+           :cljs-test     {:extra-deps {olical/cljs-test-runner {:mvn/version "RELEASE"}}
+                           :main-opts  ["-m" "cljs-test-runner.main"]}
+           :test-readme   {:extra-deps {seancorfield/readme {:mvn/version "RELEASE"}}
+                           :main-opts  ["-m" "seancorfield.readme"]}
+
+           ;; Linting ;;
+           :lint {:extra-deps {clj-kondo {:mvn/version "RELEASE"}}
+                  :main-opts ["-m" "clj-kondo.main"]}
+
+           ;; Building/releasing ;;
+           :build   {:extra-deps {seancorfield/depstar {:mvn/version "1.0.94"}}
+                     :main-opts  ["-m" "hf.depstar.jar" "target/kilderkin.jar"]}
+           :release {:extra-deps {deps-deploy {:mvn/version "RELEASE"}}
+                     :main-opts  ["-m" "deps-deploy.deps-deploy" "deploy" "target/kilderkin.jar"]}
+           :install {:extra-deps {deps-deploy {:mvn/version "RELEASE"}}
+                     :main-opts  ["-m" "deps-deploy.deps-deploy" "install" "target/kilderkin.jar"]}}}

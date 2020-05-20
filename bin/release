@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Releases the library to Clojars.
+
+source $(dirname ${BASH_SOURCE[0]})/util.sh
+
+if [[ -n $(git status --porcelain) ]]; then
+  read -p "$(log_info "Looks like there are untracked files: \n$(git -c color.status=always status -s)\n Continue anyway? [y/N]")" continue
+  [[ "$continue" == y ]] || exit 1
+fi
+
+read -p "Enter Clojars token: " clojars_token
+read -p "Enter a version: " version
+
+sed -i '' "s/^\(  <version>\).*\(<\/version>\)/\1$version\2/" pom.xml
+sed -i '' "s/\(<tag>\).*\(<\/tag>\)/\1$(git rev-parse HEAD)\2/" pom.xml
+
+run_trace clojure -A:build
+run_trace CLOJARS_USERNAME=aeriksson CLOJARS_PASSWORD=$clojars_token clojure -A:release

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Runs the unit tests
+
+source $(dirname ${BASH_SOURCE[0]})/util.sh
+
+log_info "Running unit tests in Clojure..."
+run_trace clojure -A:clj:extras:clj-test
+
+log_info "Running unit tests in ClojureScript..."
+run_trace clojure -A:cljs:extras:cljs-test
+
+log_info "Testing the README..."
+run_trace clojure -A:clj:test-readme
